@@ -6,7 +6,8 @@
     "prettier"
   ],
   "plugins": [
-    "babel"
+    "babel",
+    "import"
   ],
   "env": {
     "node": true

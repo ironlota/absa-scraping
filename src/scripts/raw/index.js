@@ -5,8 +5,9 @@ const _ = require('lodash');
 const chalk = require('chalk');
 const ora = require('ora');
 
-const getter = require('../utils/exception-free');
-const fs = require('../utils/fs-promise');
+const fs = require('../../utils/fs-promise');
+
+const getter = require('./getter');
 
 const spinnerAllChunks = ora(chalk.red(`${chalk.underline.bgBlue('SCRAPING')} Data!\n`)).start();
 
@@ -31,12 +32,12 @@ const scrapingAction = async (folder, chunk) => {
   try {
     const res = await scrapeTrivago(chunk);
     return res.map(([id, value]) => {
-      const reviews = getter(value.hydraReviews.reviews);
-      const selectedLang = getter(value.hydraReviewsselectedLanguage);
+      const reviews = getter.reviews(value);
+      const selectedLang = getter.selectedLang(value);
 
       if (!value || _.isEmpty(reviews) || selectedLang !== 'en') return Promise.resolve(false);
 
-      const normalizedReview = value.hydraReviews.reviews.map((review) => review.text);
+      const normalizedReview = reviews.map((review) => review.text);
 
       return fs.writeFileAsync(`./${folder}/${id}.json`, JSON.stringify(normalizedReview, null, 2), 'utf8');
     });
@@ -54,7 +55,7 @@ module.exports = async (folder, minRange, maxRange) => {
       .reduce((promise, chunk) => promise.then(() => {
         console.log(chalk.red(`${chalk.underline.bgBlue('SCRAPING')} chunks no: ${chunk} \n`));
 
-        return Promise.all([Promise.delay(2000), scrapingAction(folder, chunk)]);
+        return Promise.all([Promise.delay(1000), scrapingAction(folder, chunk)]);
       }), Promise.resolve());
 
     spinnerAllChunks.succeed(chalk.green(`${chalk.underline.bgBlue('SCRAPING')} Done!`));
