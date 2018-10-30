@@ -55,7 +55,7 @@ module.exports = async (folder, minRange, maxRange) => {
       .reduce((promise, chunk) => promise.then(() => {
         console.log(chalk.red(`${chalk.underline.bgBlue('SCRAPING')} chunks no: ${chunk} \n`));
 
-        return Promise.all([Promise.delay(1000), scrapingAction(folder, chunk)]);
+        return Promise.all([Promise.delay(2000), scrapingAction(folder, chunk)]);
       }), Promise.resolve());
 
     spinnerAllChunks.succeed(chalk.green(`${chalk.underline.bgBlue('SCRAPING')} Done!`));
