@@ -18,6 +18,6 @@ program
 program.scrape = program.scrape || [];
 
 if (!_.isEmpty(program.scrape)) {
-  Promise.resolve(scrape('./datas', program.scrape[0], program.scrape[1]));
+  Promise.resolve(scrape('./data', program.scrape[0], program.scrape[1]));
 }
 // console.log('  - %s cheese', program.cheese);
