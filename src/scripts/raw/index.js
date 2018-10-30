@@ -51,7 +51,7 @@ module.exports = async (folder, minRange, maxRange) => {
     const isDirCreated = await fs.existsAsync(folder);
     if (!isDirCreated) await fs.mkdirAsync(folder);
 
-    await _.chunk(_.range(minRange, maxRange, 2), 10)
+    await _.chunk(_.range(minRange, maxRange, 2), 5)
       .reduce((promise, chunk) => promise.then(() => {
         console.log(chalk.red(`${chalk.underline.bgBlue('SCRAPING')} chunks no: ${chunk} \n`));
 
