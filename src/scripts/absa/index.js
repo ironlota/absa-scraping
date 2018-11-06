@@ -26,8 +26,9 @@ module.exports = async (file) => {
     await combineData.reduce(
       (promise, chunk) =>
         promise.then(() => Promise.all([
-            Promise.delay(500),
+            Promise.delay(1250),
             absa(chunk.review).then(val => {
+              signale.debug(`GETTING ABSA Data for Review ${chunk.id}`);
               combineDataABSA.push({
                 id: chunk.id,
                 ...val,
