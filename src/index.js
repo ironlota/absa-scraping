@@ -5,14 +5,14 @@ const program = require('commander');
 // const path = require('path');
 
 // const chalk = require('chalk');
-const signale = require('signale');
+// const signale = require('signale');
 
 const _ = require('lodash');
 
 const pkg = require('../package.json');
 
 const scrape = require('./scripts/raw');
-const asba = require('./scripts/absa');
+const absa = require('./scripts/absa');
 const reduce = require('./scripts/reduce');
 
 const range = val => val.split('..').map(Number);
@@ -28,7 +28,7 @@ program
 program.scrape = program.scrape || [];
 
 if (program.absa) {
-  asba(program.absa);
+  absa(program.absa);
 }
 
 if (!_.isEmpty(program.scrape)) {
