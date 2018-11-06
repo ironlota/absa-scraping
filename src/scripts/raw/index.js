@@ -9,17 +9,17 @@ const fs = require('../../utils/fs-promise');
 
 const getter = require('./getter');
 
-const spinnerAllChunks = ora(chalk.red(`${chalk.underline.bgBlue('SCRAPING')} Data!\n`)).start();
-
 // 1137100  axios(`https://www.trivago.co.id/api/v1/_cache/accommodation/${value}/ratings.json?requestId=v12_10_5_ab_id_ID_UK`)
 
-const scrapeTrivago = async (chunk) => {
-  const promises = chunk
-    .map(value =>
-      axios.get(`https://www.trivago.co.id/api/v1/_cache/accommodation/${value}/ratings.json?requestId=v12_10_5_ab_id_ID_UK`)
-        .then(async result => [value, result.data])
-        .catch(() => [value, false])
-    );
+const scrapeTrivago = async chunk => {
+  const promises = chunk.map(value =>
+    axios
+      .get(
+        `https://www.trivago.co.id/api/v1/_cache/accommodation/${value}/ratings.json?requestId=v12_10_5_ab_id_ID_UK`
+      )
+      .then(async result => [value, result.data])
+      .catch(() => [value, false])
+  );
 
   try {
     return await Promise.all(promises);
@@ -35,11 +35,17 @@ const scrapingAction = async (folder, chunk) => {
       const reviews = getter.reviews(value);
       const selectedLang = getter.selectedLang(value);
 
-      if (!value || _.isEmpty(reviews) || selectedLang !== 'en') return Promise.resolve(false);
+      if (!value || _.isEmpty(reviews) || selectedLang !== 'en') {
+        return Promise.resolve(false);
+      }
 
-      const normalizedReview = reviews.map((review) => review.text);
+      const normalizedReview = reviews.map(review => review.text);
 
-      return fs.writeFileAsync(`./${folder}/${id}.json`, JSON.stringify(normalizedReview, null, 2), 'utf8');
+      return fs.writeFileAsync(
+        `./${folder}/${id}.json`,
+        JSON.stringify(normalizedReview, null, 2),
+        'utf8'
+      );
     });
   } catch (e) {
     console.error(e);
@@ -47,18 +53,34 @@ const scrapingAction = async (folder, chunk) => {
 };
 
 module.exports = async (folder, minRange, maxRange) => {
+  const spinnerAllChunks = ora(
+    chalk.red(`${chalk.underline.bgBlue('SCRAPING')} Data!\n`)
+  ).start();
+
   try {
     const isDirCreated = await fs.existsAsync(folder);
     if (!isDirCreated) await fs.mkdirAsync(folder);
 
-    await _.chunk(_.range(minRange, maxRange, 2), 5)
-      .reduce((promise, chunk) => promise.then(() => {
-        console.log(chalk.red(`${chalk.underline.bgBlue('SCRAPING')} chunks no: ${chunk} \n`));
+    await _.chunk(_.range(minRange, maxRange, 2), 5).reduce(
+      (promise, chunk) =>
+        promise.then(() => {
+          console.log(
+            chalk.red(
+              `${chalk.underline.bgBlue('SCRAPING')} chunks no: ${chunk} \n`
+            )
+          );
 
-        return Promise.all([Promise.delay(2000), scrapingAction(folder, chunk)]);
-      }), Promise.resolve());
+          return Promise.all([
+            Promise.delay(2000),
+            scrapingAction(folder, chunk),
+          ]);
+        }),
+      Promise.resolve()
+    );
 
-    spinnerAllChunks.succeed(chalk.green(`${chalk.underline.bgBlue('SCRAPING')} Done!`));
+    spinnerAllChunks.succeed(
+      chalk.green(`${chalk.underline.bgBlue('SCRAPING')} Done!`)
+    );
   } catch (e) {
     console.log(e);
   }
