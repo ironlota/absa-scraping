@@ -5,24 +5,28 @@ const _ = require('lodash');
 
 const fs = require('../../utils/fs-promise');
 
-const { readFile } = require('../../utils/stream');
-
-const outputFolder = 'reduce';
+const outputFolder = 'reduce_out';
 
 module.exports = (folder = './data') => {
   fs.readdirAsync(folder)
     .then(_filenames => {
       const filenames = _filenames.filter(value => value.includes('.json'));
-      return Promise.all(
-        filenames.map(value => readFile(`${folder}/${value}`, 'utf8'))
-      );
+      // return filenames.map(value => fs.readFileAsync(`${folder}/${value}`, 'utf8'));
+      return filenames.map(value => `${folder}/${value}`);
     })
     .then(async files => {
       const combineData = [];
-      files.forEach(file => {
-        const json = JSON.parse(file);
-        json.forEach(value => combineData.push(value));
-      });
+
+      signale.watch('REDUCING Data');
+      await files.reduce(
+        (promise, file) =>
+          promise.then(() => fs.readFileAsync(file, 'utf8').then((data) => {
+                const json = JSON.parse(data);
+                json.forEach(value => combineData.push(value.replace(/[&|;|\\|$|%|@|<|>|(|)|+|,]/gi, '').replace(/\r?\n|\r/gi, ' ').replace(/"/gi, '\'')));
+              }))
+        , Promise.resolve()
+      );
+      signale.success('REDUCING Data SUCCEED!');
 
       const isDirCreated = await fs.existsAsync(outputFolder);
       if (!isDirCreated) await fs.mkdirAsync(outputFolder);

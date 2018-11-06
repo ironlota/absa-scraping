@@ -76,4 +76,8 @@ typings/
 .fusebox/
 
 .DS_Store
+
+data.zip
 data/
+reduce_out/
+absa_out/

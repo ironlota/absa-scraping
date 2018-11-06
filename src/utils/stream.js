@@ -12,6 +12,7 @@ const readFile = file =>
     const array = [];
 
     jsonRead
+      .pipe(es.split())
       .pipe(
         es.mapSync(data => {
           array.push(data);
@@ -20,7 +21,7 @@ const readFile = file =>
       .on('error', err => {
         reject(err);
       })
-      .on('end', () => {
+      .on('close', () => {
         resolve(array);
       });
   });

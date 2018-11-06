@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 const axios = require('axios');
 const _ = require('lodash');
 
+const signale = require('signale');
 const chalk = require('chalk');
 const ora = require('ora');
 
@@ -24,7 +25,7 @@ const scrapeTrivago = async chunk => {
   try {
     return await Promise.all(promises);
   } catch (e) {
-    console.error(e);
+    signale.fatal(e);
   }
 };
 
@@ -48,7 +49,7 @@ const scrapingAction = async (folder, chunk) => {
       );
     });
   } catch (e) {
-    console.error(e);
+    signale.fatal(e);
   }
 };
 
@@ -64,7 +65,7 @@ module.exports = async (folder, minRange, maxRange) => {
     await _.chunk(_.range(minRange, maxRange, 2), 5).reduce(
       (promise, chunk) =>
         promise.then(() => {
-          console.log(
+          signale.info(
             chalk.red(
               `${chalk.underline.bgBlue('SCRAPING')} chunks no: ${chunk} \n`
             )
@@ -82,6 +83,6 @@ module.exports = async (folder, minRange, maxRange) => {
       chalk.green(`${chalk.underline.bgBlue('SCRAPING')} Done!`)
     );
   } catch (e) {
-    console.log(e);
+    signale.fatal(e);
   }
 };

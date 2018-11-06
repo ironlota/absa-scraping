@@ -9,10 +9,8 @@ module.exports = (text, domain = 'hotels') =>
         domain,
         text,
       },
-      async (err, response, rateLimits) => {
+      (err, response, rateLimits) => {
         if (err) reject(err);
-
-        await Promise.delay(500);
 
         resolve({
           response,
